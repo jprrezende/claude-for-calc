@@ -69,6 +69,17 @@ def _candidates(configured):
         pats.append(os.path.join(appdata, "Claude", "claude-code", "*", "claude.exe"))
     if local:
         pats.append(os.path.join(local, "Packages", "Claude_*", "LocalCache", "Roaming", "Claude", "claude-code", "*", "claude.exe"))
+    # Layouts mais novos do app: ...\Claude-Data\<id>\claude-code\<versão>\<hash>\claude.exe
+    for base in (local, appdata):
+        if base:
+            for sub in ("Claude-Data", "Claude"):
+                pats.append(os.path.join(base, sub, "*", "claude-code", "*", "*", "claude.exe"))
+                pats.append(os.path.join(base, sub, "claude-code", "*", "*", "claude.exe"))
+    if appdata:
+        pats.append(os.path.join(appdata, "Claude", "claude-code", "*", "*", "claude.exe"))
+    if local:
+        pats.append(os.path.join(local, "Packages", "Claude_*", "LocalCache", "*", "Claude*", "claude-code", "*", "*", "claude.exe"))
+        pats.append(os.path.join(local, "Packages", "Claude_*", "LocalCache", "*", "Claude*", "*", "claude-code", "*", "*", "claude.exe"))
     if not _WIN:
         pats.append(os.path.join(home, ".config", "Claude", "claude-code", "*", "claude"))
         pats.append(os.path.join(home, "Library", "Application Support", "Claude", "claude-code", "*", "claude"))
