@@ -1,0 +1,35 @@
+name: Release OXT
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ClaudeCalc.oxt
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq zip
+          ./build.sh
+
+      - name: Compute tag
+        id: tag
+        run: |
+          VER=$(grep -oP '<version value="\K[^"]+' src/description.xml)
+          echo "tag=v${VER}-build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.tag.outputs.tag }}" dist/ClaudeCalc.oxt \
+            --target "${GITHUB_SHA}" \
+            --title "Claude for Calc ${{ steps.tag.outputs.tag }}" \
+            --generate-notes
