@@ -33,7 +33,7 @@ jobs:
         if: steps.ver.outputs.exists == 'false'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq zip
-          sed -i 's/$//' build.sh
+          sed -i 's/\r$//' build.sh
           bash build.sh
 
       - name: Create release
