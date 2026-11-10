@@ -1,5 +1,6 @@
 name: Release OXT
 
+# Publica uma release quando a versão em src/description.xml ainda não tem tag.
 on:
   push:
     branches: [main]
@@ -14,22 +15,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Read version
+        id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER=$(grep -oP '<version value="\K[^"]+' src/description.xml)
+          echo "tag=v${VER}" >> "$GITHUB_OUTPUT"
+          if gh release view "v${VER}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release v${VER} já existe; nada a fazer."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build ClaudeCalc.oxt
+        if: steps.ver.outputs.exists == 'false'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq zip
           ./build.sh
 
-      - name: Compute tag
-        id: tag
-        run: |
-          VER=$(grep -oP '<version value="\K[^"]+' src/description.xml)
-          echo "tag=v${VER}-build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
-
       - name: Create release
+        if: steps.ver.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ steps.tag.outputs.tag }}" dist/ClaudeCalc.oxt \
+          gh release create "${{ steps.ver.outputs.tag }}" dist/ClaudeCalc.oxt \
             --target "${GITHUB_SHA}" \
-            --title "Claude for Calc ${{ steps.tag.outputs.tag }}" \
+            --title "Claude for Calc ${{ steps.ver.outputs.tag }}" \
             --generate-notes
