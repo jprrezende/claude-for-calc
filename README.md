@@ -1,60 +1,65 @@
-# Claude para Calc (extensão do LibreOffice)
+# Claude for Calc (LibreOffice extension)
 
-Painel lateral de chat dentro do Calc, no estilo do "Claude para Excel": você pergunta sobre a planilha
-aberta e o Claude lê células, explica fórmulas, escreve/corrige fórmulas, formata, ordena e cria gráficos
-e tabelas dinâmicas. Cada alteração é uma ação normal do LibreOffice e pode ser desfeita com **Ctrl+Z**.
+*Leia em português: [README.pt-BR.md](README.pt-BR.md)*
 
-## Instalação (Windows 11 + LibreOffice 26.2)
-1. No Calc: **Ferramentas ▸ Gerenciador de Extensões ▸ Adicionar…** e escolha `ClaudeCalc.oxt`.
-2. Reinicie o LibreOffice.
-3. Abra uma planilha e use o menu **Claude ▸ Abrir painel do Claude** (ou o ícone laranja na barra lateral direita).
+A chat sidebar inside LibreOffice Calc, in the spirit of "Claude for Excel". Ask questions about the open
+spreadsheet and let Claude read cells, explain formulas, write or fix formulas, format, sort, and build charts
+and pivot tables. Every change is a regular LibreOffice action and can be undone with **Ctrl+Z**.
 
-## Como funciona a autenticação
-A extensão **não lê nem guarda credenciais**. Ela executa o **Claude Code** (`claude -p`) que já está no seu
-computador e que usa o login que você já tem. Ordem de detecção do executável:
-configurado em Config. → `claude` no PATH → `%USERPROFILE%\.local\bin\claude.exe` → `%APPDATA%\npm\claude.cmd`
-→ Claude Code embutido no app Claude Desktop (`%APPDATA%\Claude\claude-code\<versão>\claude.exe`, inclusive a
-variante MSIX em `%LOCALAPPDATA%\Packages\Claude_*\LocalCache\Roaming\...`).
-O executável do próprio app Claude Desktop (WindowsApps\Claude.exe) é ignorado de propósito.
+> Community project, not an official Anthropic product.
 
-- Se o painel disser **"Não conectado"**, clique em **Entrar**: abre o login do próprio Claude no navegador.
-- Alternativa sem login de assinatura: defina a variável de ambiente `ANTHROPIC_API_KEY` (chave do Console).
+## Installation (Windows 11 + LibreOffice 26.2)
+1. In Calc: **Tools ▸ Extension Manager ▸ Add…** and pick `ClaudeCalc.oxt` (build it with `./build.sh`, see below).
+2. Restart LibreOffice.
+3. Open a spreadsheet and use the **Claude ▸ Open Claude panel** menu (or the orange icon in the right sidebar).
 
-## O que o Claude pode fazer (ferramentas)
-Ler: `get_workbook_info`, `read_range`, `find_cells`, `find_errors`, `get_format`.
-Alterar: `write_range` (valores e fórmulas estilo Excel), `clear_range`, `format_range`, `copy_range`,
+## How authentication works
+The extension **never reads or stores credentials**. It runs the **Claude Code** CLI (`claude -p`) that is already
+installed on your computer and uses the sign-in you already have. The executable is detected in this order:
+path set in Settings → `claude` on the PATH → `%USERPROFILE%\.local\bin\claude.exe` → `%APPDATA%\npm\claude.cmd`
+→ the Claude Code bundled with the Claude Desktop app (`%APPDATA%\Claude\claude-code\<version>\claude.exe`,
+including the MSIX variant under `%LOCALAPPDATA%\Packages\Claude_*\LocalCache\Roaming\...`).
+The Claude Desktop app's own executable (`WindowsApps\Claude.exe`) is deliberately ignored.
+
+- If the panel says **"Not signed in"**, click **Sign in**: it opens Claude's own sign-in flow in your browser.
+- Alternative without a subscription sign-in: set the `ANTHROPIC_API_KEY` environment variable (a Console key).
+- Note: how `claude -p` usage is billed on subscription plans has changed over time. Check Anthropic's help article
+  "Use the Claude Agent SDK with your Claude plan" for the current rules.
+
+## What Claude can do (tools)
+Read: `get_workbook_info`, `read_range`, `find_cells`, `find_errors`, `get_format`.
+Change: `write_range` (values and Excel-style formulas), `clear_range`, `format_range`, `copy_range`,
 `insert_delete`, `resize`, `sort_range`, `manage_sheet`, `freeze_panes`, `add_comment`, `define_name`,
-`create_chart`, `create_pivot_table`. Mostrar: `select_range` (seleciona a célula na tela).
-O Claude só enxerga estas ferramentas: **sem terminal, sem arquivos, sem internet**.
+`create_chart`, `create_pivot_table`. Show: `select_range` (selects the cell on screen).
+Claude only sees these tools: **no terminal, no files, no internet**.
 
-Exemplos: "Explique como chegamos ao total em F20" · "Ache as células com erro e corrija" ·
-"Monte um resumo por região em outra aba, com fórmulas" · "Formate o cabeçalho e congele a primeira linha" ·
-"Crie um gráfico de colunas das vendas por mês".
+Examples: "Explain how we got the total in F20" · "Find the cells with errors and fix them" ·
+"Build a summary by region on another sheet, using formulas" · "Format the header and freeze the first row" ·
+"Create a column chart of sales by month".
 
-## Segurança e privacidade
-- As ferramentas são servidas por um servidor local em `127.0.0.1` (porta aleatória), protegido por token
-  por painel e conferência do cabeçalho Host. Nada fica exposto na rede.
-- O conteúdo das células que o Claude **lê** é enviado à Anthropic, como no Claude para Excel.
-- **Config. ▸ "Pedir confirmação antes de cada alteração"** mostra uma caixa Sim/Não antes de cada escrita.
+## Security and privacy
+- The tools are served by a local server on `127.0.0.1` (random port), protected by a per-panel token and a Host
+  header check. Nothing is exposed to the network.
+- The content of cells that Claude **reads** is sent to Anthropic, as with Claude for Excel.
+- **Settings ▸ "Ask for confirmation before every change"** shows a Yes/No box before each write.
 
-## Limitações conhecidas
-- Chat em texto simples (sem links clicáveis para células; o Claude usa `select_range` para apontá-las).
-- Ainda não há formatação condicional, validação de dados nem macros.
-- Funções novas do Excel dependem de existirem no LibreOffice (se der `#NAME?`, o Claude troca por outra).
-- Leitura limitada a 5000 células por chamada (ajustável em Config.); o Claude lê em partes.
+## Known limitations
+- Plain-text chat (no clickable cell links; Claude uses `select_range` to point at cells).
+- No conditional formatting, data validation, or macros yet.
+- Newer Excel functions only work if LibreOffice supports them (on `#NAME?`, Claude switches to an equivalent).
+- Reads are limited to 5000 cells per call (adjustable in Settings); Claude reads in chunks.
+- Tested on Linux with LibreOffice 24.2 and Claude Code 2.1.322 against a mock API; not yet validated on
+  Windows 11 with LibreOffice 26.2 or with a live model.
 
-## Solução de problemas
-- Log: `%APPDATA%\ClaudeCalc\claudecalc.log`. Configurações: `%APPDATA%\ClaudeCalc\settings.json`.
-- "Claude Code não encontrado": Config. ▸ informe o caminho do `claude.exe` ▸ Detectar.
-- Erro de login: clique em Entrar ou rode `claude auth login` em um terminal.
-- Windows sem Git for Windows pode impedir o Claude Code de iniciar; instale-o se aparecer erro sobre git-bash.
+## Troubleshooting
+- Log: `%APPDATA%\ClaudeCalc\claudecalc.log`. Settings: `%APPDATA%\ClaudeCalc\settings.json`.
+- "Claude Code not found": Settings ▸ enter the path to `claude.exe` ▸ Detect.
+- Sign-in errors: click Sign in, or run `claude auth login` in a terminal.
+- On Windows, Claude Code may fail to start without Git for Windows; install it if you see a git-bash error.
 
-## Código-fonte
-O `.oxt` é um zip: `python/claude_calc.py` (componente UNO) e `python/claudecalc/` (tools.py, panel.py,
-mcp_server.py, claude_cli.py, executor.py…). Para recompilar: `zip -r ClaudeCalc.oxt META-INF description
-description.xml images python *.xcu`.
-
-## Desenvolvimento
-- `./build.sh` gera `dist/ClaudeCalc.oxt` a partir de `src/`.
-- `tests/test_tools.py` testa as ferramentas contra um LibreOffice real (`soffice --headless --accept=socket,host=127.0.0.1,port=2002;urp;`).
-- Aviso: projeto da comunidade, não é um produto oficial da Anthropic.
+## Development
+- `./build.sh` builds `dist/ClaudeCalc.oxt` from `src/`.
+- `tests/test_tools.py` exercises the spreadsheet tools against a real LibreOffice
+  (`soffice --headless --accept="socket,host=127.0.0.1,port=2002;urp;"`).
+- Layout: `src/python/claude_calc.py` (UNO component) and `src/python/claudecalc/` (`tools.py`, `panel.py`,
+  `mcp_server.py`, `claude_cli.py`, `executor.py`, …).
