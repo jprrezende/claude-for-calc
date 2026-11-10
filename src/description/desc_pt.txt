@@ -1,0 +1,3 @@
+O Claude para Calc adiciona um chat no painel lateral do LibreOffice Calc, no estilo do Claude para Excel. Faça perguntas sobre a planilha e deixe o Claude ler células, escrever fórmulas, formatar, ordenar e criar gráficos e tabelas dinâmicas. Toda alteração é uma ação normal do LibreOffice e pode ser desfeita com Ctrl+Z.
+
+A extensão executa o Claude Code instalado no seu computador (o que acompanha o app Claude Desktop ou uma instalação separada) e, por isso, usa o login que você já tem. A extensão nunca lê nem guarda suas credenciais.

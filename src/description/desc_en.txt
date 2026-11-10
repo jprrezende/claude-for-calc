@@ -1,0 +1,3 @@
+Claude for Calc adds a sidebar chat to LibreOffice Calc, similar to Claude for Excel. Ask questions about your spreadsheet and let Claude read cells, write formulas, format ranges, sort, build charts and pivot tables. Every change is a normal, undoable (Ctrl+Z) LibreOffice action.
+
+It runs the Claude Code CLI installed on your computer (the one that ships with the Claude desktop app, or a standalone install), so it uses the sign-in you already have. The extension never reads or stores your credentials.
